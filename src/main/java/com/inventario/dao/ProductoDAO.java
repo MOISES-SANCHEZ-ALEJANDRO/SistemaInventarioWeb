@@ -2,34 +2,36 @@
 package com.inventario.dao;
 
 import java.sql.*;
-import java.util.*;
 
 import com.inventario.config.ConexionBD;
 import com.inventario.model.Producto;
 
 public class ProductoDAO {
 
-    // Método implementado por Programador A
-    public List<Producto> listarProductos() {
-        List<Producto> lista = new ArrayList<>();
-        String sql = "SELECT * FROM productos";
+    // Método implementado por Programador B
+    public Producto buscarPorId(int id) {
+        Producto p = null;
+        String sql = "SELECT * FROM productos WHERE id = ?";
 
         try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                lista.add(new Producto(
-                    rs.getInt("id"),
-                    rs.getString("nombre"),
-                    rs.getDouble("precio")
-                ));
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    p = new Producto(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getDouble("precio")
+                    );
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return lista;
+        return p;
     }
 }
